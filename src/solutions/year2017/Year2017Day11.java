@@ -1,0 +1,64 @@
+package solutions.year2017;
+
+import api.InputParser;
+import solver.DayX;
+import utils.Delimiter;
+
+public class Year2017Day11 extends DayX{
+	Integer max = Integer.MIN_VALUE;
+
+	/*
+	 * Using three axial coordinate systemm on the hex grid
+	 * https://www.redblobgames.com/grids/hexagons/
+	 */
+	@Override
+	protected Object firstPart(InputParser input){
+
+		String[] data = input.rowsAsOneArray(Delimiter.COMMA);
+		int x = 0;
+		int y = 0;
+		int z = 0;
+		for(String move: data){
+
+			switch(move) {
+
+			case "n":
+				y++;
+				z--;
+				break;
+			case "nw":
+				y++;
+				x--;
+				break;
+			case "ne":
+				z--;
+				x++;
+				break;
+			case "sw":
+				x--;
+				z++;
+				break;
+			case "s":
+				y--;
+				z++;
+				break;
+			case "se":
+				x++;
+				y--;
+				break;
+			}
+			int distance = (Math.abs(x) + Math.abs(y) + Math.abs(z)) / 2;
+			max = distance > max ? distance : max;
+		}
+		return (Math.abs(x) + Math.abs(y) + Math.abs(z)) / 2;
+	}
+
+	@Override
+	protected Object secondPart(InputParser input){
+		if(max == null){
+			firstPart(input);
+		}
+		return max;
+	}
+
+}

@@ -1,0 +1,17 @@
+package solutions.year%s;
+
+import api.InputParser;
+import solutions.DayX;
+
+public class Year%dDay%s extends DayX {
+
+	@Override
+	public Object firstPart(InputParser input) {
+		return NOT_SOLVED;
+	}
+
+	@Override
+	public Object secondPart(InputParser input) {
+		return NOT_SOLVED;
+	}
+}
