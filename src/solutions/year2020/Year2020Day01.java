@@ -9,12 +9,11 @@ public class Year2020Day01 extends DayX {
 	public Object firstPart(InputParser input) {
 		int[] values = input.asSingleIntArray();
 		int a = 0, b = 0;
-		outer: for (int i : values) {
+	
+		for (int i : values) {
 			for (int j : values) {
 				if (i + j == 2020) {
-					a = i;
-					b = j;
-					break outer;
+					return i*j;
 				}
 			}
 		}
@@ -24,19 +23,17 @@ public class Year2020Day01 extends DayX {
 	@Override
 	public Object secondPart(InputParser input) {
 		int[] values = input.asSingleIntArray();
-		int a = 0, b = 0, c = 0;
-		outer: for (int i : values) {
+
+		for (int i : values) {
 			for (int j : values) {
 				for (int k : values) {
 					if (i + j + k == 2020) {
-						a = i;
-						b = j;
-						c = k;
-						break outer;
+						
+						return i*j*k;
 					}
 				}
 			}
 		}
-		return a * b * c;
+		return -1;
 	}
 }

@@ -1,10 +1,12 @@
 package solutions.year2017;
 
+import java.util.Arrays;
+
 import api.InputParser;
 import solver.DayX;
 import utils.Delimiter;
 
-public class Year2017Day10 extends DayX{
+public class Year2017Day10 extends DayX {
 
 	public static String hash(String input) {
 		int[] std = { 17, 31, 73, 47, 23 };
@@ -14,32 +16,32 @@ public class Year2017Day10 extends DayX{
 		int[] result = hash(values, 64);
 
 		String s = "";
-		for(int b: result){
+		for (int b : result) {
 			s += Integer.toHexString(b | 0x100).substring(1, 3);
 		}
 		return s;
 	}
 
-	private static int[] toAsciiValues(char[] input, int padding){
+	private static int[] toAsciiValues(char[] input, int padding) {
 		int[] target = new int[input.length + padding];
 		int i = 0;
-		for(char c: input){
+		for (char c : input) {
 			target[i] = (int) c;
 			i++;
 		}
 		return target;
 	}
 
-	private static int[] hash(int[] lengths, int rounds){
+	private static int[] hash(int[] lengths, int rounds) {
 		int[] original = new int[256];
-		for(int i = 0; i < 256; i++){
+		for (int i = 0; i < 256; i++) {
 			original[i] = i;
 		}
 		int skip = 0;
 		int pos = 0;
 		int[] hash = new int[16];
-		for(int k = 0; k < rounds; k++){
-			for(int i = 0; i < lengths.length; i++){
+		for (int k = 0; k < rounds; k++) {
+			for (int i = 0; i < lengths.length; i++) {
 				// System.out.println(lengths[i] + " " + pos);
 				reverse(original, pos % original.length, lengths[i]);
 				pos += (lengths[i] + skip) % 256;
@@ -47,15 +49,15 @@ public class Year2017Day10 extends DayX{
 				skip++;
 			}
 		}
-		for(int i = 0; i < original.length; i++){
+		for (int i = 0; i < original.length; i++) {
 			// lol at bitwise operation imlicitely casting in
 			hash[i / 16] = (hash[i / 16] ^ original[i]);
 		}
 		return hash;
 	}
 
-	public static void reverse(int[] array, int start, int length){
-		for(int i = 0; i < length / 2; i++){
+	public static void reverse(int[] array, int start, int length) {
+		for (int i = 0; i < length / 2; i++) {
 			int ind = (start + i) % array.length;
 			int tmp = array[ind];
 			int index = (start + length - i - 1) % array.length;
@@ -66,28 +68,29 @@ public class Year2017Day10 extends DayX{
 	}
 
 	@Override
-	public Object firstPart(InputParser input){
+	public Object firstPart(InputParser input) {
 		int[] lengths = input.asSingleIntArray(Delimiter.COMMA);
 		int[] original = new int[256];
-		for(int i = 0; i < 256; i++){
+		for (int i = 0; i < original.length; i++) {
 			original[i] = i;
 		}
 		int skip = 0;
 		int pos = 0;
-		for(int i = 0; i < lengths.length; i++){
+		for (int i = 0; i < lengths.length; i++) {
 			reverse(original, pos % original.length, lengths[i]);
 			pos += lengths[i] + skip;
-			if(pos > 255){
-				pos %= 255;
+			if (pos >= original.length) {
+				pos %= original.length;
 			}
 			skip++;
+			System.out.println(Arrays.toString(original));
 		}
-		
+//		return NOT_SOLVED;
 		return original[0] * original[1];
 	}
 
 	@Override
-	public Object secondPart(InputParser input){
+	public Object secondPart(InputParser input) {
 		return hash(input.joinLinesToString(Delimiter.NONE).replaceAll("\\s", ""));
 	}
 }

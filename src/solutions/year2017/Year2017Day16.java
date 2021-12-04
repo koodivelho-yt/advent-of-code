@@ -11,7 +11,7 @@ public class Year2017Day16 extends DayX{
 
 	@Override
 	public Object firstPart(InputParser input){
-		String[] ins = input.rowsAsOneArray(Delimiter.COMMA);
+		String[] ins = input.joinLineValuesToArray(Delimiter.COMMA);
 		ArrayList<Character> chars = new ArrayList<>();
 		for(char c = 'a'; c < 'a' + 16; c++){
 			chars.add(c);
@@ -23,7 +23,7 @@ public class Year2017Day16 extends DayX{
 	
 	@Override
 	public Object secondPart(InputParser input){
-		String[] ins = input.rowsAsOneArray(Delimiter.COMMA);
+		String[] ins = input.joinLineValuesToArray(Delimiter.COMMA);
 		String original;
 		ArrayList<Character> chars = new ArrayList<>();
 		for(char c = 'a'; c < 'a' + 16; c++){

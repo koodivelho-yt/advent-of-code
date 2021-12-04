@@ -8,7 +8,7 @@ public class Year2017Day17 extends DayX{
 
 	@Override
 	public Object firstPart(InputParser input){
-		int data = input.getDataAsInt();
+		int data = input.integer();
 		LinkedList<Integer> i = new LinkedList<>(0);
 		fillArray(i, data, 2017);
 		Node<Integer> n = i.head;
@@ -39,7 +39,7 @@ public class Year2017Day17 extends DayX{
 	@Override
 	public Object secondPart(InputParser input){
 
-		int data = input.getDataAsInt();
+		int data = input.integer();
 		int value = 0;
 		int index = 0;
 		for(int i = 1; i <= 50000000; i++){

@@ -16,7 +16,6 @@ public class Year2017Day18 extends DayX{
 	@Override
 	public Object firstPart(InputParser input){
 		List<Instruction> lines = input.asInstruction(Delimiter.SPACE);
-		LinkedList<Long> q = new LinkedList<>();
 
 		Queue<Long> q0 = new LinkedList<>();
 		Program p1 = new Program(0,lines, q0, q0);

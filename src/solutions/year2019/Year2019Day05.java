@@ -11,15 +11,15 @@ public class Year2019Day05 extends DayX {
 
 	@Override
 	public Object firstPart(InputParser input) {
-		int[] program = input.asSingleIntArray(Delimiter.COMMA);
+		long[] program = input.intCodeProgram();
 		IntcodeComputer ic = IntcodeComputer.day5capable(program);
 		ic.writeInput(1);
 		ic.runProgram();
 		
-		int result=0;
+		long result=0;
 		int checksum=0;
 		while(ic.hasOutput()) {
-			int o = ic.readNext();
+			long o = ic.readNext();
 			if(o == 0) {
 				checksum+=o;
 			}else {
@@ -39,7 +39,8 @@ public class Year2019Day05 extends DayX {
 
 	@Override
 	public Object secondPart(InputParser input) {
-		int[] program = input.asSingleIntArray(Delimiter.COMMA);
+
+		long[] program = input.intCodeProgram();
 		IntcodeComputer ic = IntcodeComputer.day5capable(program);
 		ic.writeInput(5);
 		ic.runProgram();

@@ -6,7 +6,7 @@ import solver.DayX;
 public class Year2017Day03 extends DayX {
 
 	public Object firstPart(InputParser input) {
-		final int DATA = input.getDataAsInt();
+		final int DATA = input.integer();
 		int x = 0, y = 0;
 		int current = 1;
 		int next = 0;
@@ -47,7 +47,7 @@ public class Year2017Day03 extends DayX {
 	 * This might not be the best code anyway.
 	 */
 	public Object secondPart(InputParser input) {
-		final int DATA = input.getDataAsInt();
+		final int DATA = input.integer();
 		int arraySize = 1000;
 
 		int[][] array = new int[arraySize][arraySize];

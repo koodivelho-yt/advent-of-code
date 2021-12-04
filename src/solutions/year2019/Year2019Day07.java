@@ -13,11 +13,11 @@ public class Year2019Day07 extends DayX {
 
 	@Override
 	public Object firstPart(InputParser input) {
-		int[] program = input.intCodeProgram();
+		long[] program = input.intCodeProgram();
 
 		List<Integer> sequence = new ArrayList<Integer>(Arrays.asList(0, 1, 2, 3, 4));
 		IntcodeComputer[] computers;
-		int max = 0;
+		long max = 0;
 		do {
 			computers = new IntcodeComputer[5];
 			for (int i = 0; i < computers.length; i++) {
@@ -27,12 +27,12 @@ public class Year2019Day07 extends DayX {
 			computers[0].runProgram();
 
 			for (int i = 0; i < computers.length - 1; i++) {
-				int out = computers[i].readNext();
+				long out = computers[i].readNext();
 				computers[i + 1].writeInput(sequence.get(i + 1)).writeInput(out);
 				computers[i + 1].runProgram();
 			}
 
-			int mx = computers[4].readNext();
+			long mx = computers[4].readNext();
 			if (mx > max) {
 				max = mx;
 			}
@@ -43,44 +43,42 @@ public class Year2019Day07 extends DayX {
 
 	@Override
 	public Object secondPart(InputParser input) {
-		int[] program = { 3, 26, 1001, 26, -4, 26, 3, 27, 1002, 27, 2, 27, 1, 27, 26, 27, 4, 27, 1001, 28, -1, 28, 1005,
-				28, 6, 99, 0, 0, 5 };// input.intCodeProgram();
 
-		List<Integer> sequence = new ArrayList<Integer>(Arrays.asList(9, 8, 7, 6, 5));
+		long[] program = input.intCodeProgram();
+
+		List<Integer> sequence = new ArrayList<Integer>(Arrays.asList(5, 6, 7, 8, 9));
 		IntcodeComputer[] computers = new IntcodeComputer[5];
 
-		int max = 0;
+		long max = 0;
+		do {
+			char id = 'A';
+			// init all computers
+			for (int i = 0; i < computers.length; i++) {
+				computers[i] = IntcodeComputer.day5capable(program);
+				computers[i].setID(id++);
 
-		for (int i = 0; i < computers.length; i++) {
-			computers[i] = IntcodeComputer.day5capable(program);
-			computers[i].start();
-			computers[i].writeInput(sequence.indexOf(i));
-		}
+			}
+			// connect the input streams to each other
+			for (int i = 0; i < 5; i++) {
+				computers[(i + 1) % 5].connect(computers[i]);
 
-		computers[0].writeInput(0);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+			}
 
-		for (int i = 0;; i++) {
-			computers[i].waitHalt();
-			if (!computers[i].hasEnded())
-				computers[(i + 1) % 5].writeInput(computers[i % 5].readNext());
-				
-			else
-				break;
-		}
+			for (int i = 0; i < 5; i++) {
+				computers[i].writeInput(sequence.get(i));
+				computers[i].start();
+			}
+			computers[0].writeInput(0);
+			for (IntcodeComputer ic : computers) {
+				ic.join();
+			}
+			long next = computers[4].readNext();
+			if (next > max)
+				max = next;
+		} while (hasNextPermutation(sequence));
+		System.out.println(max);
 
-		int mx = computers[4].readNext();
-
-		if (mx > max) {
-			max = mx;
-		}
-
-		System.out.println(mx);
-		return NOT_SOLVED;
+		return max;
 	}
 
 	public boolean hasNextPermutation(List<Integer> list) {

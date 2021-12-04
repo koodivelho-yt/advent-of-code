@@ -9,7 +9,7 @@ public class Year2019Day02 extends DayX {
 
 	@Override
 	public Object firstPart(InputParser input) {
-		int[] values = input.asSingleIntArray(Delimiter.COMMA);
+		long[] values = input.intCodeProgram();
 		values[1] = 12;
 		values[2] = 2;
 		IntcodeComputer ic = IntcodeComputer.day2(values);
@@ -20,15 +20,15 @@ public class Year2019Day02 extends DayX {
 	public Object secondPart(InputParser input) {
 
 		int c = 19690720;
-		int[] values = input.asSingleIntArray(Delimiter.COMMA);
+		long[] values = input.intCodeProgram();
 
 		int i = 0;
 		int noun = 0;
 		int verb = 0;
-		int[] program;
+		long[] program;
 		IntcodeComputer ic;
 		do {
-			program = new int[values.length];
+			program = new long[values.length];
 			System.arraycopy(values, 0, program, 0, values.length);
 			noun = i / 100;
 			verb = i % 100;

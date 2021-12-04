@@ -11,12 +11,13 @@ import java.util.stream.Collectors;
 import db.DBManager;
 import solver.Options;
 import solver.Solver;
+import utils.DayGenerator;
 
 public class Main {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
-		
+		DayGenerator.main(args);
 		/*
 		 * Set the path for aoc.db
 		 */
@@ -38,7 +39,6 @@ public class Main {
 		String username;
 
 		if (args.length == 0) {
-//			interactiveMode();
 			username = "";
 		} else {
 			year = currentyear; // current year by default

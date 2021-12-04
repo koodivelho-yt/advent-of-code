@@ -16,10 +16,12 @@ public class Year2016Day03 extends DayX {
 		return input//
 				.linesAsLists(Delimiter.WHITESPACE, Integer::parseInt)//
 				.stream()//
+				//sort the numbers into ascending order
 				.map(i -> {
 					Collections.sort(i);
 					return i;
 				})//
+				//Three lines cannot be a triangle,
 				.filter(i -> i.get(0) + i.get(1) > i.get(2))//
 				.count();
 	}

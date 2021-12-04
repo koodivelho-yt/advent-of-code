@@ -14,7 +14,7 @@ public class Year2017Day11 extends DayX{
 	@Override
 	protected Object firstPart(InputParser input){
 
-		String[] data = input.rowsAsOneArray(Delimiter.COMMA);
+		String[] data = input.joinLineValuesToArray(Delimiter.COMMA);
 		int x = 0;
 		int y = 0;
 		int z = 0;

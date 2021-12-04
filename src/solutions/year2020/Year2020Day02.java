@@ -10,6 +10,7 @@ public class Year2020Day02 extends DayX {
 	@Override
 	public Object firstPart(InputParser input) {
 		List<String> rows = input.getLines();
+
 		int correct = 0;
 		for (String s : rows) {
 
@@ -34,9 +35,11 @@ public class Year2020Day02 extends DayX {
 			String[] values = s.split("-| |: ");
 			int index1 = Integer.parseInt(values[0]) - 1;
 			int index2 = Integer.parseInt(values[1]) - 1;
-			String letters = "" + values[3].charAt(index1) + values[3].charAt(index2);
-			letters = letters.replace(values[2], "");
-			if(letters.length()==1) {
+
+			char c = values[2].charAt(0);
+			char first = values[3].charAt(index1);
+			char second = values[3].charAt(index2);
+			if ((c == first && c != second) || (c != first && c == second)) {
 				correct++;
 			}
 		}

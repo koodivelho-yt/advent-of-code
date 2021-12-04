@@ -2,46 +2,65 @@ package solutions.year2019.intcodecomputer;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class IntcodeComputer {
 
+	private Thread runner;
+
 	private Instruction[] opcodeTable;
 
-	private int[] program;
-	private int instructionPointer = 0;
-	private LinkedBlockingQueue<Integer> input;
-	private LinkedBlockingQueue<Integer> output;
-	
-	ReentrantLock lock = new ReentrantLock();
+	private long[] program;
 
-	public static IntcodeComputer day2(int[] program) {
+	private int instructionPointer = 0;
+	private int relativeBase = 0;
+
+	private LinkedBlockingQueue<Long> input;
+	private LinkedBlockingQueue<Long> output;
+
+	private LinkedBlockingQueue<Long> outputLog;
+
+	private String id = "";
+
+	public void setID(char c) {
+		this.id = String.valueOf(c);
+	}
+
+	public static IntcodeComputer day2(long[] program) {
 		return new IntcodeComputer(program);
 	}
 
-	public static IntcodeComputer day5capable(int[] program) {
+	public static IntcodeComputer day5capable(long[] program) {
 		IntcodeComputer ic = new IntcodeComputer(program);
 		ic.loadDay5extendedInstructions();
 		return ic;
 	}
 
-	private IntcodeComputer(int[] program) {
-		this.program = program;
-		loadDefaultInstructions();
-		input = new LinkedBlockingQueue<Integer>();
-		output = new LinkedBlockingQueue<Integer>();
+	public static IntcodeComputer day9capable(long[] program) {
+		IntcodeComputer ic = day5capable(program);
+		ic.loadDay9extendedInstructions();
+		return ic;
+	}
 
+	private IntcodeComputer(long[] program) {
+		long[] prog = new long[program.length];
+		System.arraycopy(program, 0, prog, 0, program.length);
+		this.program = prog;
+
+		loadDefaultInstructions();
+
+		input = new LinkedBlockingQueue<Long>();
+		output = new LinkedBlockingQueue<Long>();
+		outputLog = new LinkedBlockingQueue<Long>();
 	}
 
 	private void loadDay5extendedInstructions() {
 		// input
 		opcodeTable[3] = (opcode) -> {
 			try {
+				long in = input.poll(1, TimeUnit.HOURS);
+
 				int[] modes = parseModes(opcode);
-				lock.unlock();
-				int in = input.poll(1, TimeUnit.HOURS);
-				lock.lock();
-				int index = program[instructionPointer + 1];
+				int index = indexFromMode(modes[0],instructionPointer + 1);
 				program[index] = in;
 
 			} catch (InterruptedException e) {
@@ -54,18 +73,21 @@ public class IntcodeComputer {
 		// output
 		opcodeTable[4] = (opcode) -> {
 			int[] modes = parseModes(opcode);
-			int op = modes[0] == 0 ? program[program[instructionPointer + 1]] : program[instructionPointer + 1];
+			int index = indexFromMode(modes[0], instructionPointer + 1);
+			long op = program[index];
 			output.add(op);
+			outputLog.add(op);
 			return 2;
 		};
 
 		// jump-if-true
 		opcodeTable[5] = (opcode) -> {
 			int[] modes = parseModes(opcode);
-			int index1 = modes[0] == 0 ? program[instructionPointer + 1] : instructionPointer + 1;
-			int index2 = modes[1] == 0 ? program[instructionPointer + 2] : instructionPointer + 2;
+
+			int index1 = indexFromMode(modes[0], instructionPointer + 1);
+			int index2 = indexFromMode(modes[1], instructionPointer + 2);
 			if (program[index1] != 0) {
-				instructionPointer = program[index2];
+				instructionPointer = (int) program[index2];
 				return 0;
 			} else {
 				return 3;
@@ -74,11 +96,11 @@ public class IntcodeComputer {
 		// jump-if-false
 		opcodeTable[6] = (opcode) -> {
 			int[] modes = parseModes(opcode);
-			int index1 = modes[0] == 0 ? program[instructionPointer + 1] : instructionPointer + 1;
-			int index2 = modes[1] == 0 ? program[instructionPointer + 2] : instructionPointer + 2;
+			int index1 = indexFromMode(modes[0], instructionPointer + 1);
+			int index2 = indexFromMode(modes[1], instructionPointer + 2);
 
 			if (program[index1] == 0) {
-				instructionPointer = program[index2];
+				instructionPointer = (int) program[index2];
 				return 0;
 			} else {
 				return 3;
@@ -88,9 +110,9 @@ public class IntcodeComputer {
 		// less-than
 		opcodeTable[7] = (opcode) -> {
 			int[] modes = parseModes(opcode);
-			int index1 = modes[0] == 0 ? program[instructionPointer + 1] : instructionPointer + 1;
-			int index2 = modes[1] == 0 ? program[instructionPointer + 2] : instructionPointer + 2;
-			int index3 = modes[2] == 0 ? program[instructionPointer + 3] : instructionPointer + 3;
+			int index1 = indexFromMode(modes[0], instructionPointer + 1);
+			int index2 = indexFromMode(modes[1], instructionPointer + 2);
+			int index3 = indexFromMode(modes[2], instructionPointer + 3);
 
 			if (program[index1] < program[index2]) {
 				program[index3] = 1;
@@ -103,9 +125,9 @@ public class IntcodeComputer {
 		// equal
 		opcodeTable[8] = (opcode) -> {
 			int[] modes = parseModes(opcode);
-			int index1 = modes[0] == 0 ? program[instructionPointer + 1] : instructionPointer + 1;
-			int index2 = modes[1] == 0 ? program[instructionPointer + 2] : instructionPointer + 2;
-			int index3 = modes[2] == 0 ? program[instructionPointer + 3] : instructionPointer + 3;
+			int index1 = indexFromMode(modes[0], instructionPointer + 1);
+			int index2 = indexFromMode(modes[1], instructionPointer + 2);
+			int index3 = indexFromMode(modes[2], instructionPointer + 3);
 
 			if (program[index1] == program[index2]) {
 				program[index3] = 1;
@@ -115,6 +137,39 @@ public class IntcodeComputer {
 			return 4;
 		};
 
+	}
+
+	private void loadDay9extendedInstructions() {
+		// adjustBase
+		opcodeTable[9] = (opcode) -> {
+			int[] modes = parseModes(opcode);
+			int index = indexFromMode(modes[0], instructionPointer + 1);
+			relativeBase += program[index];
+			return 2;
+		};
+	}
+
+	private long ensureIndex(long index) {
+		if (program.length <= index) {
+			long[] newprogram = new long[(int) index + 1];
+			System.arraycopy(program, 0, newprogram, 0, program.length);
+			System.out.println("Increasing memory from " + program.length + " " + newprogram.length);
+			program = newprogram;
+		}
+		return index;
+	}
+
+	private int indexFromMode(int mode, int ip) {
+		switch (mode) {
+		case 2:
+			return (int) ensureIndex(relativeBase + program[ip]);
+		case 1:
+			return (int) ensureIndex(ip);
+		case 0:
+			return (int) ensureIndex(program[ip]);
+		default:
+			throw new RuntimeException();
+		}
 	}
 
 	private int[] parseModes(int opcode) {
@@ -133,9 +188,9 @@ public class IntcodeComputer {
 		// add
 		opcodeTable[1] = (opcode) -> {
 			int[] modes = parseModes(opcode);
-			int index1 = modes[0] == 0 ? program[instructionPointer + 1] : instructionPointer + 1;
-			int index2 = modes[1] == 0 ? program[instructionPointer + 2] : instructionPointer + 2;
-			int index3 = modes[2] == 0 ? program[instructionPointer + 3] : instructionPointer + 3;
+			int index1 = indexFromMode(modes[0], instructionPointer + 1);
+			int index2 = indexFromMode(modes[1], instructionPointer + 2);
+			int index3 = indexFromMode(modes[2], instructionPointer + 3);
 
 			program[index3] = program[index1] + program[index2];
 			return 4;
@@ -144,12 +199,11 @@ public class IntcodeComputer {
 		// mul
 		opcodeTable[2] = (opcode) -> {
 			int[] modes = parseModes(opcode);
-			int index1 = modes[0] == 0 ? program[instructionPointer + 1] : instructionPointer + 1;
-			int index2 = modes[1] == 0 ? program[instructionPointer + 2] : instructionPointer + 2;
-			int index3 = modes[2] == 0 ? program[instructionPointer + 3] : instructionPointer + 3;
+			int index1 = indexFromMode(modes[0], instructionPointer + 1);
+			int index2 = indexFromMode(modes[1], instructionPointer + 2);
+			int index3 = indexFromMode(modes[2], instructionPointer + 3);
 
 			program[index3] = program[index1] * program[index2];
-
 			return 4;
 		};
 
@@ -159,32 +213,21 @@ public class IntcodeComputer {
 	}
 
 	public void executeNext() {
-		int opcode = program[instructionPointer] % 100;
-		int target = opcodeTable[opcode].execute(program[instructionPointer]);
+		ensureIndex(instructionPointer);
+		int opcode = (int) program[instructionPointer] % 100;
+		int target = opcodeTable[opcode].execute((int) program[instructionPointer]);
 		instructionPointer += target;
 	}
 
 	public int runProgram() {
-
-		lock.lock();
 		while (program[instructionPointer] != 99) {
 			executeNext();
-			
+
 		}
-		lock.unlock();
-
-		return program[0];
-	}
-	
-
-
-	public interface Instruction {
-
-		public int execute(int modes);
-
+		return (int) program[0];
 	}
 
-	public Integer readNext() {
+	public Long readNext() {
 		while (true) {
 			try {
 				return output.poll(5, TimeUnit.HOURS);
@@ -194,7 +237,7 @@ public class IntcodeComputer {
 		}
 	}
 
-	public IntcodeComputer writeInput(int i) {
+	public IntcodeComputer writeInput(long i) {
 		input.add(i);
 		return this;
 	}
@@ -203,18 +246,42 @@ public class IntcodeComputer {
 		return !output.isEmpty();
 	}
 
-	public void waitHalt() {
-		System.out.println("Waited halt");
-		lock.lock();
-		lock.unlock();
-		System.out.println("Wait ended");
+	public void connect(IntcodeComputer ic) {
+		this.input = ic.output;
 	}
 
 	public boolean hasEnded() {
-		System.out.println(input.size()+" " +output.size()+" "+program[instructionPointer]);
 		return program[instructionPointer] == 99;
 	}
+
 	public void start() {
-		new Thread(() -> this.runProgram()).start();
+		this.runner = new Thread(() -> this.runProgram());
+		runner.start();
 	}
+
+	public void join() {
+		try {
+			runner.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private interface Instruction {
+
+		public int execute(int modes);
+
+	}
+	
+
+
+	public String t(Object o) {
+		String s = o.getClass().getName();
+		return o.getClass().getName().substring(s.lastIndexOf(".") + 1) + "@" + Integer.toHexString(o.hashCode());
+	}
+
+	public void info() {
+		System.out.println("This is computer " + id + ". \nmy input is " + t(input) + " and output is " + t(output));
+	}
+
 }

@@ -59,7 +59,7 @@ public class Year2015Day09 extends DayX {
 				int distance = dist[start][end];
 				if(distance==0) {
 					//no route, though this was not required in the task
-					totaldistance=0;
+					//totaldistance=0;
 					break;
 				}
 				totaldistance+=distance;

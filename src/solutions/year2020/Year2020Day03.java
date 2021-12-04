@@ -11,20 +11,25 @@ public class Year2020Day03 extends DayX {
 	public Object firstPart(InputParser input) {
 		List<String> lines = input.getLines();
 
-		int right = 3;
-		int current = 0;
+		return slope(lines, 3, 1);
+
+	}
+
+	private int slope(List<String> lines, int right, int down) {
 		int trees = 0;
-		for (int i = 1; i < lines.size(); i++) {
-			current += right;
+		int current = 0;
+		
+		for (int i = 0; i < lines.size(); i += down) {
+
 			String line = lines.get(i);
 			char tree = line.charAt(current % line.length());
 			if (tree == '#') {
 				trees++;
 			}
-		}
-		System.out.println(trees);
-		return trees;
+			current += right;
 
+		}
+		return trees;
 	}
 
 	@Override
@@ -39,24 +44,9 @@ public class Year2020Day03 extends DayX {
 		int[] rights = { 1, 3, 5, 7, 1 };
 		int[] downs = { 1, 1, 1, 1, 2 };
 		long result = 1;
-		for (int r = 0; r < rights.length; r++) {
-			int right = rights[r];
-			int current = 0;
-			int trees = 0;
-			for (int i = 0; i < lines.size();) {
-				current += right;
-				i += downs[r];
-				if (i >= lines.size())
-					break;
-				String line = lines.get(i);
-				char tree = line.charAt(current % line.length());
-				if (tree == '#') {
-					trees++;
-				}
-			}
-			result *= trees;
+		for (int i = 0; i < rights.length; i++) {
+			result *= slope(lines, rights[i], downs[i]);
 		}
-		System.out.println(result);
 		return result;
 	}
 }

@@ -9,11 +9,11 @@ import utils.Delimiter;
 
 public class Year2016Day01 extends DayX {
 	private Set<String> visited = new HashSet<String>();
-	private int result = -1;
+	private int part2result = -1;
 
 	@Override
 	public Object firstPart(InputParser input) {
-		String[] in = input.rowsAsOneArray(Delimiter.COMMA);
+		String[] in = input.joinLineValuesToArray(Delimiter.COMMA);
 		int x = 0;
 		int y = 0;
 		Direction d = Direction.NORTH;
@@ -28,8 +28,8 @@ public class Year2016Day01 extends DayX {
 			for (int i = 0; i < a; i++) {
 				x += d.dx;
 				y += d.dy;
-				if (result==-1 && !visited.add(x + "," + y)) {
-					result= Math.abs(x) + Math.abs(y);
+				if (part2result==-1 && !visited.add(x + "," + y)) {
+					part2result= Math.abs(x) + Math.abs(y);
 				}
 			}
 		}
@@ -38,10 +38,10 @@ public class Year2016Day01 extends DayX {
 
 	@Override
 	public Object secondPart(InputParser input) {
-		if(result==-1) {
+		if(part2result==-1) {
 			firstPart(input);
 		}
-		return result;
+		return part2result;
 	}
 
 	private enum Direction {
@@ -62,7 +62,5 @@ public class Year2016Day01 extends DayX {
 		public Direction previous() {
 			return Direction.values()[(((this.ordinal() + 3) % 4))];
 		}
-
 	}
-
 }
